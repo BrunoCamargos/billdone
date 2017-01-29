@@ -3,7 +3,20 @@
   "version": "1.0.0",
   "description": "API for a financial control",
   "main": "index.js",
+    "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint *.js",
+    "lint:fix": "eslint --fix *.js"
+  },
   "repository": "git@github.com:BrunoCamargos/billdone.git",
   "author": "Bruno Camargos <bruno.camargos@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "3.13.0",
+    "eslint-config-airbnb": "latest",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "3.0.2",
+    "eslint-plugin-react": "6.9.0"
+  }
 }
