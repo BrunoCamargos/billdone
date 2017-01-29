@@ -1,0 +1,9 @@
+{
+  "name": "billdone",
+  "version": "1.0.0",
+  "description": "API for a financial control",
+  "main": "index.js",
+  "repository": "git@github.com:BrunoCamargos/billdone.git",
+  "author": "Bruno Camargos <bruno.camargos@gmail.com>",
+  "license": "MIT"
+}
