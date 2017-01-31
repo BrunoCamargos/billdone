@@ -4,7 +4,7 @@
   "description": "API for a financial control",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "babel-node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
@@ -20,6 +20,8 @@
     "eslint-plugin-react": "6.9.0"
   },
   "dependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.22.0",
     "express": "^4.14.1"
   }
 }

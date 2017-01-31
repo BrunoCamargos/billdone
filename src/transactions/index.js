@@ -1,5 +1,1 @@
-const transactionsRoutes = require('./transactions-routes');
-
-module.exports = {
-  routes: transactionsRoutes,
-};
+export { default } from './transactions-routes';
