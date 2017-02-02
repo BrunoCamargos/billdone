@@ -1,0 +1,15 @@
+{
+	"testRegex": "(/test/.*|(-|\\.)(test|spec))\\.(js)$",
+	"collectCoverage": true,
+	"coverageReporters": ["json", "lcov", "text", "text-summary"],
+	"coverageThreshold": {
+		"global": {
+			"statements": 50,
+			"branches": 70,
+			"functions": 50,
+			"lines": 50
+		}
+	},
+	"testEnvironment": "node",
+	"verbose": true
+}

@@ -4,7 +4,8 @@ API for a financial control
 Some terms to work with
 
 Transactions 
- - income - receita/rendimento
- - expense - despesa
+ - incomes 	- receitas/rendimentos
+ - expenses - despesas
+ - bills 		- contas
 
 
