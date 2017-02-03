@@ -1,1 +1,1 @@
-import './src';
+export { default } from './src';
