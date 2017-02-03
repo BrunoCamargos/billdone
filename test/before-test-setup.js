@@ -1,4 +1,4 @@
-import supertest from 'supertest'; // usar promise supertest-as-promise
+import supertest from 'supertest-as-promised';
 import app from '../';
 
 global.request = supertest(app);
