@@ -1,4 +1,16 @@
 import supertest from 'supertest-as-promised';
-import app from '../';
+import app from '../src';
 
-global.request = supertest(app);
+console.log('before-test-setup');
+beforeAll((done) => {
+  // app.start()
+  //   .then(() => {
+  //     global.request = supertest(app);
+  //     done();
+  //   });
+
+  app.on('started', () => {
+    global.request = supertest(app);
+    done();
+  });
+});

@@ -1,1 +1,4 @@
-export { default } from './src';
+import './src';
+// import app from './src';
+
+// app.start();

@@ -1,6 +1,7 @@
 {
 	"testRegex": "(/test/.*-test|(-|\\.)(test|spec))\\.(js)$",
 	"collectCoverage": true,
+	"setupFiles": ["./test/before-test-start.js"],
 	"setupTestFrameworkScriptFile": "./test/before-test-setup.js",
 	"coverageReporters": ["json", "lcov", "text", "text-summary"],
 	"coverageThreshold": {
