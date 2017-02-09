@@ -1,9 +1,10 @@
 import { MongoClient } from 'mongodb';
 import Bluebird from 'bluebird';
+import config from './config';
 
 let db = {};
 
-const connect = () => MongoClient.connect('mongodb://localhost:27017/test', { promiseLibrary: Bluebird })
+const connect = () => MongoClient.connect(config.db.url, { promiseLibrary: Bluebird })
   .then((database) => {
     console.log('Connected to db!');
     db = database;
