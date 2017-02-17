@@ -19,7 +19,7 @@ handleRoutes(app);
 
 connectDb()
   .then(() => {
-    app.listen(3001, () => {
+    app.listen(config.app.port, config.app.host, () => {
       console.log('Example app listening on port 3001!');
       app.emit('started');
     });
