@@ -1,8 +1,10 @@
 import supertest from 'supertest-as-promised';
-import app from '../src';
+import joiAssert from 'joi-assert';
+import app from '../../src';
 
-console.log('before-test-setup');
-beforeAll((done) => {
+global.joiAssert = joiAssert;
+
+before('Starting app...', (done) => {
   // app.start()
   //   .then(() => {
   //     global.request = supertest(app);

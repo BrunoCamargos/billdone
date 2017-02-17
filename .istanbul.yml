@@ -1,0 +1,18 @@
+verbose: false
+instrumentation:
+  include-all-sources: true
+reporting:
+  print: both
+check:
+  global:
+    statements: 50
+    lines: 50
+    branches: 50
+    functions: 50
+    excludes: []
+  each:
+    statements: 0
+    lines: 0
+    branches: 0
+    functions: 0
+    excludes: []

@@ -4,10 +4,13 @@
   "description": "API for a financial control",
   "main": "index.js",
   "scripts": {
+    "test": "npm run test:coverage ",
+    "test:unit": "NODE_ENV=test mocha test/unit/**/*-spec.js",
+    "test:integration": "NODE_ENV=test mocha test/integration/**/*-test.js",
+    "test:coverage": "NODE_ENV=test istanbul cover _mocha && istanbul check-coverage",
     "start": "babel-node index.js",
-    "test": "jest --config .jest --forceExit",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint": "eslint *.js .",
+    "lint:fix": "eslint --fix *.js ."
   },
   "dependencies": {
     "babel-cli": "^6.22.2",
@@ -22,12 +25,16 @@
   "author": "Bruno Camargos <bruno.camargos@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint": "3.13.0",
     "eslint-config-airbnb": "latest",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "3.0.2",
     "eslint-plugin-react": "6.9.0",
+    "istanbul": "1.1.0-alpha.1",
     "jest": "^18.1.0",
+    "joi-assert": "^0.0.3",
+    "mocha": "^3.2.0",
     "supertest": "^3.0.0",
     "supertest-as-promised": "^4.0.2"
   }

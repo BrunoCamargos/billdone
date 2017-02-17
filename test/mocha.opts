@@ -1,0 +1,4 @@
+--reporter spec
+--recursive
+--require babel-register
+--require test/global-setup.js

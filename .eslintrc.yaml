@@ -4,6 +4,9 @@ parserOptions:
 env:
   node: true
   es6: true
-  jest: true
+  mocha: true
 globals:
   request: true
+  assert: true
+  expect: true
+  joiAssert: true
