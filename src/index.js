@@ -7,6 +7,12 @@ const app = express();
 
 handleRoutes(app);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something failed!' });
+  next();
+});
+
 // app.start = () => {
 //   return connectDb()
 //     .then(() => {
