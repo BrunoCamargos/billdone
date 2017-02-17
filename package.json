@@ -4,13 +4,14 @@
   "description": "API for a financial control",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:coverage ",
+    "checkdep": "depcheck && snyk auth 24e5f65a-a5a5-4cc3-b2f0-ea85f87f06ef && snyk test",
+    "pretest": "yarn lint && yarn checkdep",
+    "test": "NODE_ENV=test istanbul cover _mocha && istanbul check-coverage",
     "test:unit": "NODE_ENV=test mocha test/unit/**/*-spec.js",
     "test:integration": "NODE_ENV=test mocha test/integration/**/*-test.js",
-    "test:coverage": "NODE_ENV=test istanbul cover _mocha && istanbul check-coverage",
     "start": "babel-node index.js",
-    "lint": "eslint *.js .",
-    "lint:fix": "eslint --fix *.js ."
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "dependencies": {
     "babel-cli": "^6.22.2",
@@ -26,15 +27,16 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "depcheck": "^0.6.7",
     "eslint": "3.13.0",
     "eslint-config-airbnb": "latest",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "3.0.2",
     "eslint-plugin-react": "6.9.0",
     "istanbul": "1.1.0-alpha.1",
-    "jest": "^18.1.0",
     "joi-assert": "^0.0.3",
     "mocha": "^3.2.0",
+    "snyk": "^1.25.0",
     "supertest": "^3.0.0",
     "supertest-as-promised": "^4.0.2"
   }
