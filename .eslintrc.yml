@@ -10,3 +10,4 @@ globals:
   assert: true
   expect: true
   joiAssert: true
+  getCollection: true
