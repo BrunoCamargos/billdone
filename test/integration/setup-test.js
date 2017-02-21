@@ -1,4 +1,4 @@
-import supertest from 'supertest-as-promised';
+import supertest from 'supertest';
 import joiAssert from 'joi-assert';
 import app from '../../src';
 import { getCollection } from '../../src/commons/db';
