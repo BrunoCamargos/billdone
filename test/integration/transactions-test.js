@@ -34,9 +34,8 @@ describe('Integration: ', () => {
         .send(actual)
         .expect(201)
         .then((res) => {
-          const transaction = res.body;
-
-          expect(transaction.Opa).to.equal(actual.Opa);
+          expect(res.headers).to.include.keys('location');
+          expect(res.body.Opa).to.equal(actual.Opa);
 
           return getCollection(collectionName).find().toArray()
             .then((transactions) => {

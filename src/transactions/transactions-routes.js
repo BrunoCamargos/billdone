@@ -11,7 +11,11 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
   getCollection(collectionName).insertOne(req.body)
-    .then(result => res.status(201).json(result.ops[0]));
+    .then((result) => {
+      const transaction = result.ops[0];
+      res.location(`/transactions/${transaction._id}`);
+      res.status(201).json(transaction);
+    });
 });
 
 export default router;
