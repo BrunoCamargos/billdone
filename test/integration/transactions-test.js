@@ -28,7 +28,12 @@ describe('Integration: ', () => {
     });
 
     it('Should insert a transaction', () => {
-      const actual = { Opa: '97' };
+      const actual = {
+        type: 'expense',
+        amount: 1567,
+        description: 'expense test',
+      };
+
       return request
         .post('/transactions')
         .send(actual)
@@ -37,10 +42,15 @@ describe('Integration: ', () => {
           expect(res.headers).to.include.keys('location');
           expect(res.body.Opa).to.equal(actual.Opa);
 
+          // TODO: passar para findOne
           return getCollection(collectionName).find().toArray()
             .then((transactions) => {
               expect(transactions).to.have.lengthOf(1);
-              expect(transactions[0].Opa).to.equal(actual.Opa);
+
+              const expected = transactions[0];
+              delete expected._id;
+
+              expect(expected).to.deep.equal(actual);
             });
         });
     });
