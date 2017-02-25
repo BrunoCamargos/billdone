@@ -1,4 +1,5 @@
 import express from 'express';
+import { ObjectId } from 'mongodb';
 import { getCollection } from '../commons/db';
 import validateTransaction from './transaction-schema';
 
@@ -24,6 +25,17 @@ router.post('/', (req, res) => {
   } else {
     res.status(400).send(validationResult.error.message);
   }
+});
+
+router.delete('/:id', (req, res) => {
+  getCollection(collectionName).deleteOne({ _id: new ObjectId(req.params.id) })
+    .then((result) => {
+      if (!result.deletedCount) {
+        res.status(404).send('transaction not found');
+      } else {
+        res.status(204).send();
+      }
+    });
 });
 
 export default router;

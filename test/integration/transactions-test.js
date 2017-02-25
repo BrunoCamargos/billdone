@@ -11,7 +11,7 @@ describe('Integration: ', () => {
     it('Should return a list of transactions', () => {
       const actual = [{
         type: 'expense',
-        amount: 1567,
+        amount: -1567,
         description: 'expense test',
         _id: 1,
       }, {
@@ -72,5 +72,29 @@ describe('Integration: ', () => {
           expect(res.text).to.equal('child "type" fails because ["type" is required]');
         });
     });
+
+    it('Should remove a transaction', () => {
+      const actual = {
+        type: 'expense',
+        amount: -1567,
+        description: 'expense test',
+      };
+
+      return getCollection(collectionName).insertOne(actual)
+        .then((result) => {
+          expect(result.insertedCount).to.equal(1);
+
+          return request
+            .delete(`/transactions/${actual._id}`)
+            .expect(204);
+        });
+    });
+
+    it('Should return transaction not found', () => request
+      .delete('/transactions/58b2169e8d51e83a48b0b8d7')
+      .expect(404)
+      .then((res) => {
+        expect(res.text).to.equal('transaction not found');
+      }));
   });
 });
