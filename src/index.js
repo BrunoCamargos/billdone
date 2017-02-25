@@ -5,7 +5,7 @@ import config from './commons/config';
 import connectDb from './commons/db';
 
 const app = express();
-app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.json()); // parsing application/json
 
 handleRoutes(app);
 

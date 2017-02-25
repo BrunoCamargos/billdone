@@ -6,7 +6,7 @@ const router = express.Router();
 const collectionName = 'transactions';
 
 router.get('/', (req, res) => {
-  getCollection(collectionName).find().toArray()
+  getCollection(collectionName).find({}).toArray()
     .then(transactions => res.json(transactions));
 });
 

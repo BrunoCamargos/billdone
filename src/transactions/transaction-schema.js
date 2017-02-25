@@ -1,8 +1,16 @@
 import Joi from 'joi';
 
 const schema = {
-  amount: Joi.number().required(),
-  type: Joi.string().required(),
+  amount: Joi.required()
+    .when('type', {
+      is: 'income',
+      then: Joi.number().integer().positive(),
+    })
+    .when('type', {
+      is: 'expense',
+      then: Joi.number().integer().negative(),
+    }),
+  type: Joi.string().valid('expense', 'income').required(),
   description: Joi.string().optional(),
 };
 
