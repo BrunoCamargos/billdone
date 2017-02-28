@@ -6,12 +6,15 @@
   "scripts": {
     "checkdep": "depcheck && snyk auth 24e5f65a-a5a5-4cc3-b2f0-ea85f87f06ef && snyk test",
     "pretest": "yarn lint && yarn checkdep",
+    "node-debug": "DEBUG=express* babel-node index.js",
+    "chrome-debug": "babel-node --debug-brk --inspect index.js",
     "test": "NODE_ENV=test istanbul cover _mocha && istanbul check-coverage",
     "test:unit": "NODE_ENV=test mocha test/unit/**/*.js",
     "test:integration": "NODE_ENV=test mocha test/integration/**/*.js",
     "start": "babel-node index.js",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "metric": "nodejs-dashboard -- babel-node index.js"
   },
   "dependencies": {
     "babel-cli": "^6.22.2",
@@ -37,6 +40,7 @@
     "istanbul": "1.1.0-alpha.1",
     "joi-assert": "^0.0.3",
     "mocha": "^3.2.0",
+    "nodejs-dashboard": "^0.4.0",
     "snyk": "^1.25.0",
     "supertest": "^3.0.0"
   }
