@@ -13,4 +13,7 @@ before('Starting app...', () => startApp()
     server = app;
   }));
 
-after('Stopping app...', () => server.close());
+after('Stopping app...', () => {
+  server.close();
+  server = null;
+});

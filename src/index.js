@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import morgan from 'morgan';
 import Promise from 'bluebird';
 import handleRoutes from './handle-routes';
 import config from './commons/config';
@@ -8,6 +9,8 @@ import * as db from './commons/db';
 const expressFactory = () => {
   const app = express();
   app.use(bodyParser.json()); // parsing application/json
+  app.use(morgan('combined', { immediate: true })); // Request
+  app.use(morgan('dev')); // Response
 
   handleRoutes(app);
 
