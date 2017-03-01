@@ -4,7 +4,7 @@
   "description": "API for a financial control",
   "main": "index.js",
   "scripts": {
-    "checkdep": "depcheck && snyk auth 24e5f65a-a5a5-4cc3-b2f0-ea85f87f06ef && snyk test",
+    "checkdep": "depcheck --ignores nodejs-dashboard && snyk auth 24e5f65a-a5a5-4cc3-b2f0-ea85f87f06ef && snyk test",
     "pretest": "yarn lint && yarn checkdep",
     "node-debug": "DEBUG=express* babel-node index.js",
     "chrome-debug": "babel-node --debug-brk --inspect index.js",

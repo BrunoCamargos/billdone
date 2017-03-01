@@ -6,12 +6,11 @@ import validateTransaction from './transaction-schema';
 const router = express.Router();
 const collectionName = 'transactions';
 
-router.get('/', (req, res) => {
-  getCollection(collectionName).find({}).toArray()
-    .then(transactions => res.json(transactions));
-});
+router.get('/', (req, res, next) => getCollection(collectionName).find().toArray()
+  .then(transactions => res.json(transactions))
+  .catch(next));
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
   const transactionPayload = req.body;
   const validationResult = validateTransaction(transactionPayload);
 
@@ -21,13 +20,14 @@ router.post('/', (req, res) => {
         const transaction = insertResult.ops[0];
         res.location(`/transactions/${transaction._id}`);
         res.status(201).json(transaction);
-      });
+      })
+      .catch(next);
   } else {
     res.status(400).send(validationResult.error.message);
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   getCollection(collectionName).deleteOne({ _id: new ObjectId(req.params.id) })
     .then((result) => {
       if (!result.deletedCount) {
@@ -35,7 +35,8 @@ router.delete('/:id', (req, res) => {
       } else {
         res.status(204).send();
       }
-    });
+    })
+    .catch(next);
 });
 
 export default router;

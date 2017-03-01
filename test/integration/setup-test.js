@@ -1,20 +1,16 @@
 import supertest from 'supertest';
 import joiAssert from 'joi-assert';
-import app from '../../src';
+import startApp from '../../src';
 import { getCollection } from '../../src/commons/db';
 
 global.joiAssert = joiAssert;
 global.getCollection = getCollection;
 
-before('Starting app...', (done) => {
-  // app.start()
-  //   .then(() => {
-  //     global.request = supertest(app);
-  //     done();
-  //   });
-
-  app.on('started', () => {
+let server = {};
+before('Starting app...', () => startApp()
+  .then((app) => {
     global.request = supertest(app);
-    done();
-  });
-});
+    server = app;
+  }));
+
+after('Stopping app...', () => server.close());

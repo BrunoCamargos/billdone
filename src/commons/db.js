@@ -6,16 +6,17 @@ let db = {};
 
 const connect = () => MongoClient.connect(config.db.url, { promiseLibrary: Bluebird })
   .then((database) => {
-    console.log('Connected to db!');
+    console.log('Connected to database!');
     db = database;
+    db.on('close', () => console.log('Disconnected from database!'));
   })
-  .catch((error) => {
-    console.log('Error from connet', error);
-    throw error;
+  .catch((err) => {
+    console.error('Unable to connect to database:', err);
+    throw err;
   });
+
+const disconnect = () => db.close();
 
 const getCollection = collectionName => db.collection(collectionName);
 
-export default connect;
-
-export { getCollection };
+export { connect, disconnect, getCollection };
