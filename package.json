@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "checkdep": "depcheck --ignores nodejs-dashboard && snyk auth 24e5f65a-a5a5-4cc3-b2f0-ea85f87f06ef && snyk test",
-    "pretest": "yarn lint && yarn checkdep",
     "node-debug": "DEBUG=express* babel-node index.js",
     "chrome-debug": "babel-node --debug-brk --inspect index.js",
-    "test": "NODE_ENV=test istanbul cover _mocha && istanbul check-coverage",
+    "pretest": "yarn lint && yarn checkdep",
+    "test": "NODE_ENV=test nyc mocha",
     "test:unit": "NODE_ENV=test mocha test/unit/**/*.js",
     "test:integration": "NODE_ENV=test mocha test/integration/**/*.js",
     "start": "babel-node index.js",
@@ -31,6 +31,7 @@
   "author": "Bruno Camargos <bruno.camargos@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "babel-plugin-istanbul": "^4.0.0",
     "chai": "^3.5.0",
     "depcheck": "^0.6.7",
     "eslint": "^3.15.0",
@@ -38,10 +39,10 @@
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "6.9.0",
-    "istanbul": "1.1.0-alpha.1",
     "joi-assert": "^0.0.3",
     "mocha": "^3.2.0",
     "nodejs-dashboard": "^0.4.0",
+    "nyc": "^10.1.2",
     "snyk": "^1.25.0",
     "supertest": "^3.0.0"
   }

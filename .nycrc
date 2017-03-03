@@ -1,0 +1,17 @@
+{
+	"include": ["**/src/**"],
+	"temp-directory": "./coverage/.nyc_output",
+	"lines": 80,
+	"statements": 80,
+	"functions": 80,
+	"branches": 80,	
+	"reporter": [
+	  "text",
+	  "text-summary",
+	  "lcov"
+	],
+	"all": true,
+  "sourceMap": false,
+  "instrument": false,
+	"check-coverage": true
+}

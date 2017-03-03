@@ -19,7 +19,6 @@ const morganResponse = (app) => {
 
 const setupMorgan = app => morganResponse(morganRequest(app));
 
-
 const expressFactory = () => {
   const app = express();
   app.use(bodyParser.json()); // parsing application/json
