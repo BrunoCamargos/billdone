@@ -5,10 +5,10 @@ reporting:
   print: both
 check:
   global:
-    statements: 50
-    lines: 50
-    branches: 50
-    functions: 50
+    statements: 80
+    lines: 80
+    branches: 69 #algo está errado, o valor não bate com o sumário
+    functions: 80
     excludes: []
   each:
     statements: 0
