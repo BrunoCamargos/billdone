@@ -1,7 +1,7 @@
-import validateTransaction from '../../src/transactions/transaction-schema';
+import validateTransaction from '../../src/transactions/transactions-schema';
 
 describe('Unit: ', () => {
-  describe('transaction-schema.js', () => {
+  describe('transactions-schema.js', () => {
     describe('.validateTransaction()', () => {
       describe('"amount" field', () => {
         it('should be required', () => {

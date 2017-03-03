@@ -41,7 +41,7 @@ describe('Integration: ', () => {
       const actual = {
         type: 'expense',
         amount: -1567,
-        description: 'expense test',
+        description: 'expense test - insert',
       };
 
       return request
@@ -58,10 +58,10 @@ describe('Integration: ', () => {
         });
     });
 
-    it('Should return a badRequest status on invalid payload', () => {
+    it('Should return a BadRequest status on invalid payload', () => {
       const actual = {
         amount: -1567,
-        description: 'expense test',
+        description: 'expense test - invalid insert',
       };
 
       return request
@@ -96,5 +96,29 @@ describe('Integration: ', () => {
       .then((res) => {
         expect(res.text).to.equal('transaction not found');
       }));
+
+    it('Should update a transaction', () => {
+      let actual = {
+        type: 'expense',
+        amount: -1567,
+        description: 'expense test - update',
+      };
+
+      return getCollection(collectionName).insertOne(actual)
+        .then(result => expect(result.insertedCount).to.equal(1))
+        .then(() => {
+          const transactionId = actual._id;
+          actual = {
+            type: 'income',
+            amount: 1377,
+            description: 'expense test - updated',
+          };
+
+          return request.put(`/transactions/${String(transactionId)}`).send(actual).expect(204)
+            .then(() => getCollection(collectionName).findOne(actual))
+            .then(expected => expect(expected)
+              .to.deep.equal(Object.assign({}, actual, { _id: transactionId })));
+        });
+    });
   });
 });
