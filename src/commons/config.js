@@ -7,8 +7,9 @@ const envVarsSchema = joi.object({
   NODE_ENV: joi.string().valid('test', 'development', 'production').required(),
   DB_URL: joi.string().required(),
   APP_PORT: joi.string().default('3775').optional(),
-  APP_HOST: joi.string().default('localhost').optional(),
+  APP_HOST: joi.string().required(),
 }).unknown().required();
+
 
 const { error, value: envVars } = joi.validate(process.env, envVarsSchema);
 if (error) {

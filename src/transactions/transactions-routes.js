@@ -11,14 +11,11 @@ router.get('/', (req, res, next) => getCollection(collectionName).find().toArray
   .catch(next));
 
 const validatePayload = (payload, res) => new Promise((resolve) => {
-  const validationResult = validateTransaction(payload);
-
-  if (!validationResult.error) {
-    resolve(payload);
-  } else {
-    res.status(400).send(validationResult.error.message);
-  }
+  validateTransaction(payload)
+    .then(resolve)
+    .catch(validationError => res.status(400).send(validationError.message));
 });
+
 router.post('/', (req, res, next) => {
   validatePayload(req.body, res)
     .then(transaction => getCollection(collectionName).insertOne(transaction))

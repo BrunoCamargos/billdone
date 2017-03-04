@@ -1,19 +1,20 @@
-import Joi from 'joi';
+import joi from 'joi';
+import validateSchema from '../commons/schema-validator';
 
 const schema = {
-  amount: Joi.required()
+  amount: joi.required()
     .when('type', {
       is: 'income',
-      then: Joi.number().integer().positive(),
+      then: joi.number().integer().positive(),
     })
     .when('type', {
       is: 'expense',
-      then: Joi.number().integer().negative(),
+      then: joi.number().integer().negative(),
     }),
-  type: Joi.string().valid('expense', 'income').required(),
-  description: Joi.string().optional(),
+  type: joi.string().valid('expense', 'income').required(),
+  description: joi.string().optional(),
 };
 
-const validateTransaction = transaction => Joi.validate(transaction, schema, { abortEarly: false });
+const validateTransaction = transaction => validateSchema(transaction, schema);
 
 export default validateTransaction;
