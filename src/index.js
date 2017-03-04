@@ -28,7 +28,9 @@ const expressFactory = () => {
 
   app.use((err, req, res, next) => {
     console.error('Express unhandled exception: ', err);
-    res.status(500).json({ error: 'Something wrong!' });
+    res.status(500).json({
+      message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
+    });
     next();
   });
 

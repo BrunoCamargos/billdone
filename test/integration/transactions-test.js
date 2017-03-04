@@ -52,9 +52,7 @@ describe('Integration: ', () => {
           expect(res.headers).to.include.keys('location');
 
           return getCollection(collectionName).findOne(actual, { fields: { _id: 0 } })
-            .then((expected) => {
-              expect(expected).to.deep.equal(actual);
-            });
+            .then(expected => expect(expected).to.deep.equal(actual));
         });
     });
 
@@ -68,9 +66,9 @@ describe('Integration: ', () => {
         .post('/transactions')
         .send(actual)
         .expect(400)
-        .then((res) => {
-          expect(res.text).to.equal('child "type" fails because ["type" is required]');
-        });
+        .then(res => expect(res.body).to.deep.equal({
+          message: 'child "type" fails because ["type" is required]',
+        }));
     });
 
     it('Should remove a transaction', () => {
@@ -93,9 +91,9 @@ describe('Integration: ', () => {
     it('Should return transaction not found', () => request
       .delete('/transactions/58b2169e8d51e83a48b0b8d7')
       .expect(404)
-      .then((res) => {
-        expect(res.text).to.equal('transaction not found');
-      }));
+      .then(res => expect(res.body).to.deep.equal({
+        message: 'transaction not found',
+      })));
 
     it('Should update a transaction', () => {
       let actual = {
