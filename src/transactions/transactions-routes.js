@@ -42,12 +42,29 @@ router.delete('/:id', (req, res, next) => {
     .catch(next);
 });
 
+const createObjectId = hexStringId => new Promise((resolve, reject) => {
+  try {
+    resolve(ObjectId.createFromHexString(hexStringId));
+  } catch (e) {
+    reject(new Error('transaction id must be a string of 24 hex characters'));
+  }
+});
+
 router.put('/:id', (req, res, next) => {
-  validatePayload(req.body, res)
-    .then(transaction => getCollection(collectionName)
-      .update({ _id: new ObjectId(req.params.id) }, { $set: transaction }))
-    .then(() => res.status(204).json())
-    .catch(next);
+  Promise.all([createObjectId(req.params.id), validateTransaction(req.body)])
+    .then(([transactionId, transaction]) => {
+      const queryById = { _id: transactionId };
+
+      getCollection(collectionName)
+        .findOneAndUpdate(queryById, { $set: transaction }, {
+          returnOriginal: false,
+          upsert: true,
+        })
+        .then(updatedResult => res.status(200).json(updatedResult.value))
+        .catch(next);
+    })
+    .catch(validationError => res.status(400)
+      .json(errorResponseFactory(validationError.message)));
 });
 
 export default router;

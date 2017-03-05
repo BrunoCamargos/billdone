@@ -8,7 +8,7 @@ describe('Integration: ', () => {
         .catch(() => done());
     });
 
-    it('Should return a list of transactions', () => {
+    it('should return a list of transactions', () => {
       const actual = [{
         type: 'expense',
         amount: -1567,
@@ -37,7 +37,7 @@ describe('Integration: ', () => {
         });
     });
 
-    it('Should insert a transaction', () => {
+    it('should insert a transaction', () => {
       const actual = {
         type: 'expense',
         amount: -1567,
@@ -56,7 +56,7 @@ describe('Integration: ', () => {
         });
     });
 
-    it('Should return a BadRequest status on invalid payload', () => {
+    it('should return a BadRequest status on invalid payload', () => {
       const actual = {
         amount: -1567,
         description: 'expense test - invalid insert',
@@ -71,7 +71,7 @@ describe('Integration: ', () => {
         }));
     });
 
-    it('Should remove a transaction', () => {
+    it('should remove a transaction', () => {
       const actual = {
         type: 'expense',
         amount: -1567,
@@ -88,35 +88,67 @@ describe('Integration: ', () => {
         });
     });
 
-    it('Should return transaction not found', () => request
+    it('should receive NotFound status when trying to delete a non-existent transaction', () => request
       .delete('/transactions/58b2169e8d51e83a48b0b8d7')
       .expect(404)
       .then(res => expect(res.body).to.deep.equal({
         message: 'transaction not found',
       })));
 
-    it('Should update a transaction', () => {
-      let actual = {
+    it('should update a transaction', () => {
+      const transactionInserted = {
         type: 'expense',
         amount: -1567,
         description: 'expense test - update',
       };
 
-      return getCollection(collectionName).insertOne(actual)
+      return getCollection(collectionName).insertOne(transactionInserted)
         .then(result => expect(result.insertedCount).to.equal(1))
         .then(() => {
-          const transactionId = actual._id;
-          actual = {
+          const transactionId = transactionInserted._id;
+          const transactionPayload = {
             type: 'income',
             amount: 1377,
             description: 'expense test - updated',
           };
 
-          return request.put(`/transactions/${String(transactionId)}`).send(actual).expect(204)
-            .then(() => getCollection(collectionName).findOne(actual))
+          return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(200)
+            .then(res => expect(res.body).to.deep
+              .equal(Object.assign({}, transactionPayload, { _id: String(transactionId) })))
+            .then(() => getCollection(collectionName).findOne(transactionPayload))
             .then(expected => expect(expected)
-              .to.deep.equal(Object.assign({}, actual, { _id: transactionId })));
+              .to.deep.equal(Object.assign({}, transactionPayload, { _id: transactionId })));
         });
+    });
+
+    it('should update a non-existent transaction', () => {
+      const transactionId = '58b2169e8d51e83a48b0b8d7';
+      const transactionPayload = {
+        type: 'income',
+        amount: 1179,
+        description: 'income test - updated',
+      };
+      const expected = Object.assign({}, transactionPayload, { _id: transactionId });
+
+      return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(200)
+        .then(res => expect(res.body).to.deep.equal(expected))
+        .then(() => getCollection(collectionName).findOne(transactionPayload))
+        .then(actual => expect(Object.assign({}, actual, { _id: String(actual._id) }))
+          .to.deep.equal(expected));
+    });
+
+    it('should receive BadRequest status when trying to update with an invalid transactionId', () => {
+      const transactionId = '58b2169e8d51e83a48b0b8dk';
+      const transactionPayload = {
+        type: 'income',
+        amount: 1179,
+        description: 'income test - updated',
+      };
+
+      return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(400)
+        .then(res => expect(res.body).to.deep.equal({
+          message: 'transaction id must be a string of 24 hex characters',
+        }));
     });
   });
 });
