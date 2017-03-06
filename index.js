@@ -1,4 +1,4 @@
-import startApp from './src';
+import startApp from './src/app';
 
 // TODO: unit tests
 process.on('uncaughtException', (err) => {

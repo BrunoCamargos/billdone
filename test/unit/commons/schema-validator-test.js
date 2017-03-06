@@ -9,10 +9,10 @@ const schema = {
 describe('Unit: schema-validator.js ', () => {
   describe('.validate()', () => {
     it('object parameter should be provided', () => validateSchema()
-      .catch(err => expect(err.message).to.equal('object to validate not provided')));
+      .should.be.rejectedWith('object to validate not provided'));
 
     it('schema parameter should be provided', () => validateSchema({ a: 1 })
-      .catch(err => expect(err.message).to.equal('schema type to validate not provided')));
+      .should.be.rejectedWith('schema type to validate not provided'));
 
     it('should resolve with a valid object', () => {
       const validObject = { amount: 1 };
@@ -22,19 +22,12 @@ describe('Unit: schema-validator.js ', () => {
     });
 
     it('should reject with an invalid error object', () => {
-      const invalidObject = { description: 'invalid object' };
-      const expected = [{
-        message: '"amount" is required',
-        path: 'amount',
-        type: 'any.required',
-        context: { key: 'amount' },
-      }];
+      const invalidObject = {
+        description: 'invalid object',
+      };
 
       return validateSchema(invalidObject, schema)
-        .catch((err) => {
-          expect(err.details).to.deep.equal(expected);
-          expect(err.message).to.equal('child "amount" fails because ["amount" is required]');
-        });
+        .should.be.rejectedWith('child "amount" fails because ["amount" is required]');
     });
   });
 });
