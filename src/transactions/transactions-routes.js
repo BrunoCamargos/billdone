@@ -6,11 +6,24 @@ import validateTransaction from './transactions-schema';
 const router = express.Router();
 const collectionName = 'transactions';
 
+const sendResponse = (statusCode, res, transactions) => {
+  res.format({
+    json: () => res.status(statusCode).json(transactions),
+    // text: () => res.status(statusCode).send(JSON.stringify(transactions)),
+    // 406 é tratado no express unhandled exception
+    /* default: () => res.status(406).json({
+       message: `mime type is not acceptable`,
+     }),*/
+  });
+};
+
 const errorResponseFactory = errorMessage => ({ message: errorMessage });
 
-router.get('/', (req, res, next) => getCollection(collectionName).find().toArray()
-  .then(transactions => res.json(transactions))
-  .catch(next));
+router.get('/', (req, res, next) => {
+  getCollection(collectionName).find().toArray()
+    .then(transactions => sendResponse(200, res, transactions))
+    .catch(next);
+});
 
 const validatePayload = (payload, res) => new Promise((resolve) => {
   validateTransaction(payload)

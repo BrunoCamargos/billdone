@@ -37,6 +37,20 @@ describe('Integration: ', () => {
         });
     });
 
+    it('should not accept mime type other than application/json', () => request
+      .get('/transactions')
+      .set('Accept', 'text/html')
+      .expect(406)
+      .then(res => expect(res.body).to.deep.equal({
+        message: 'type text/html is not acceptable, try changing to application/json',
+      })));
+
+    it('should accept mime type application/json', () => request
+      .get('/transactions')
+      .set('Accept', 'application/json')
+      .expect(200)
+      .then(res => expect(res.body).to.have.lengthOf(0)));
+
     it('should insert a transaction', () => {
       const actual = {
         type: 'expense',

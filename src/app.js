@@ -27,10 +27,17 @@ const expressFactory = () => {
   handleRoutes(app);
 
   app.use((err, req, res, next) => {
-    console.error('Express unhandled exception: ', err);
-    res.status(500).json({
-      message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
-    });
+    if (err.statusCode && err.statusCode === 406) {
+      res.status(err.statusCode).json({
+        message: `type ${req.headers.accept} is not acceptable, try changing to ${err.types.join(' or ')}`,
+      });
+    } else {
+      console.error('Express unhandled exception: ', err);
+      res.status(500).json({
+        message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
+      });
+    }
+
     next();
   });
 

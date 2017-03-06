@@ -18,6 +18,7 @@ describe('Unit: app.js ', () => {
       return startApp()
         .catch((err) => {
           expect(processExitSpy).to.have.been.calledWith(1);
+          processExitSpy.restore();
           throw err;
         })
         .should.be.rejectedWith('invalid schema, expected mongodb');
