@@ -5,7 +5,7 @@ import validateTransaction from './transactions-schema';
 
 const router = express.Router();
 const collectionName = 'transactions';
-
+const transactionNotFoundMessage = 'transaction not found';
 const sendResponse = (statusCode, res, transactions) => {
   res.format({
     json: () => res.status(statusCode).json(transactions),
@@ -22,6 +22,18 @@ const errorResponseFactory = errorMessage => ({ message: errorMessage });
 router.get('/', (req, res, next) => {
   getCollection(collectionName).find().toArray()
     .then(transactions => sendResponse(200, res, transactions))
+    .catch(next);
+});
+
+router.get('/:transactionId', (req, res, next) => {
+  getCollection(collectionName).findOne()
+    .then((transaction) => {
+      if (transaction) {
+        sendResponse(200, res, transaction);
+      } else {
+        res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
+      }
+    })
     .catch(next);
 });
 
@@ -47,7 +59,7 @@ router.delete('/:id', (req, res, next) => {
   getCollection(collectionName).deleteOne({ _id: new ObjectId(req.params.id) })
     .then((result) => {
       if (!result.deletedCount) {
-        res.status(404).json(errorResponseFactory('transaction not found'));
+        res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
       } else {
         res.status(204).json();
       }

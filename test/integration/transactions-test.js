@@ -85,6 +85,33 @@ describe('Integration: ', () => {
         }));
     });
 
+    it('should return a transaction', () => {
+      const actual = {
+        type: 'expense',
+        amount: -1567,
+        description: 'expense test',
+      };
+
+      return getCollection(collectionName).insertOne(actual)
+        .then((result) => {
+          expect(result.insertedCount).to.equal(1);
+
+          return request
+            .get(`/transactions/${String(actual._id)}`)
+            .expect(200)
+            .then((res) => {
+              expect(res.body).to.deep.eql(Object.assign({}, actual, { _id: String(actual._id) }));
+            });
+        });
+    });
+
+    it('should return BadRequest trying to get a non-existent transaction', () => request
+      .get('/transactions/58b2169e8d51e83a48b0b8d7')
+      .expect(404)
+      .then(res => expect(res.body).to.deep.equal({
+        message: 'transaction not found',
+      })));
+
     it('should remove a transaction', () => {
       const actual = {
         type: 'expense',
