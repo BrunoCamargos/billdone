@@ -2,7 +2,7 @@ import validateTransaction from '../../../src/transactions/transactions-schema';
 
 describe('Unit: transactions-schema.js ', () => {
   describe('.validateTransaction()', () => {
-    describe('"amount" field', () => {
+    describe('"amount" key', () => {
       it('should be required', () => {
         const transaction = {
           type: 'expense',
@@ -28,7 +28,7 @@ describe('Unit: transactions-schema.js ', () => {
           });
       });
 
-      it('should be a positive number when "type" field is "income"', () => {
+      it('should be a positive number when the value of the key "type" is "income"', () => {
         const transaction = {
           amount: -1567,
           type: 'income',
@@ -41,7 +41,7 @@ describe('Unit: transactions-schema.js ', () => {
           });
       });
 
-      it('should be a negative number when "type" field is "expense"', () => {
+      it('should be a negative number when the value of the key "type" is "expense"', () => {
         const transaction = {
           amount: 1567,
           type: 'expense',
@@ -55,7 +55,7 @@ describe('Unit: transactions-schema.js ', () => {
       });
     });
 
-    describe('"type" field', () => {
+    describe('"type" key', () => {
       it('should be required', () => {
         const transaction = {
           amount: 1567,

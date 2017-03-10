@@ -9,9 +9,8 @@ const validate = (object, schema) => new Promise((resolve, reject) => {
     reject(new Error('schema type to validate not provided'));
   }
 
-  const { error, value } = joi.validate(object, schema, { abortEarly: false });
-
-  return error ? reject(error) : resolve(value);
+  joi.validate(object, schema, { abortEarly: false },
+    (error, value) => (error ? reject(error) : resolve(value)));
 });
 
 export default validate;

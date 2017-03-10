@@ -3,13 +3,14 @@ const collectionName = 'transactions';
 describe('Integration: ', () => {
   describe('Resources - Transactions', () => {
     beforeEach((done) => {
-      getCollection(collectionName).drop()
+      getCollection(collectionName)
+        .drop()
         .then(() => done())
         .catch(() => done());
     });
 
     it('should return a list of transactions', () => {
-      const actual = [{
+      const expected = [{
         type: 'expense',
         amount: -1567,
         description: 'expense test',
@@ -21,9 +22,10 @@ describe('Integration: ', () => {
         _id: 2,
       }];
 
-      return getCollection(collectionName).insertMany(actual)
-        .then((result) => {
-          expect(result.insertedCount).to.equal(2);
+      return getCollection(collectionName)
+        .insertMany(expected)
+        .then((transactionsInserted) => {
+          expect(transactionsInserted.insertedCount).to.equal(2);
 
           return request
             .get('/transactions')
@@ -32,7 +34,7 @@ describe('Integration: ', () => {
               const transactions = res.body;
 
               expect(transactions).to.have.lengthOf(2);
-              expect(transactions).to.deep.eql(actual);
+              expect(transactions).to.deep.equal(expected);
             });
         });
     });
@@ -52,7 +54,7 @@ describe('Integration: ', () => {
       .then(res => expect(res.body).to.have.lengthOf(0)));
 
     it('should insert a transaction', () => {
-      const actual = {
+      const validTransactionPayload = {
         type: 'expense',
         amount: -1567,
         description: 'expense test - insert',
@@ -60,47 +62,52 @@ describe('Integration: ', () => {
 
       return request
         .post('/transactions')
-        .send(actual)
+        .send(validTransactionPayload)
         .expect(201)
         .then((res) => {
           expect(res.headers).to.include.keys('location');
+          expect(res.body)
+            .to.deep.equal(Object.assign({}, validTransactionPayload, { _id: res.body._id }));
 
-          return getCollection(collectionName).findOne(actual, { fields: { _id: 0 } })
-            .then(expected => expect(expected).to.deep.equal(actual));
+          return getCollection(collectionName)
+            .findOne(validTransactionPayload, { fields: { _id: 0 } })
+            .then(transaction => expect(transaction).to.deep.equal(validTransactionPayload));
         });
     });
 
     it('should return a BadRequest status on invalid payload', () => {
-      const actual = {
+      const invalidTransactionPayload = {
         amount: -1567,
         description: 'expense test - invalid insert',
       };
 
       return request
         .post('/transactions')
-        .send(actual)
+        .send(invalidTransactionPayload)
         .expect(400)
         .then(res => expect(res.body).to.deep.equal({
           message: 'child "type" fails because ["type" is required]',
         }));
     });
 
-    it('should return a transaction', () => {
-      const actual = {
+    it('should return a single transaction', () => {
+      const expected = {
         type: 'expense',
         amount: -1567,
         description: 'expense test',
       };
 
-      return getCollection(collectionName).insertOne(actual)
-        .then((result) => {
-          expect(result.insertedCount).to.equal(1);
+      return getCollection(collectionName)
+        .insertOne(expected)
+        .then((insertedTransaction) => {
+          expect(insertedTransaction.insertedCount).to.equal(1);
 
           return request
-            .get(`/transactions/${String(actual._id)}`)
+            .get(`/transactions/${String(expected._id)}`)
             .expect(200)
             .then((res) => {
-              expect(res.body).to.deep.eql(Object.assign({}, actual, { _id: String(actual._id) }));
+              expect(res.body)
+                .to.deep.equal(Object.assign({}, expected, { _id: String(expected._id) }));
             });
         });
     });
@@ -113,23 +120,24 @@ describe('Integration: ', () => {
       })));
 
     it('should remove a transaction', () => {
-      const actual = {
+      const trasactionToDelele = {
         type: 'expense',
         amount: -1567,
         description: 'expense test',
       };
 
-      return getCollection(collectionName).insertOne(actual)
-        .then((result) => {
-          expect(result.insertedCount).to.equal(1);
+      return getCollection(collectionName)
+        .insertOne(trasactionToDelele)
+        .then((insertedTransaction) => {
+          expect(insertedTransaction.insertedCount).to.equal(1);
 
           return request
-            .delete(`/transactions/${actual._id}`)
+            .delete(`/transactions/${trasactionToDelele._id}`)
             .expect(204);
         });
     });
 
-    it('should receive NotFound status when trying to delete a non-existent transaction', () => request
+    it('should return NotFound when trying to delete a non-existent transaction', () => request
       .delete('/transactions/58b2169e8d51e83a48b0b8d7')
       .expect(404)
       .then(res => expect(res.body).to.deep.equal({
@@ -137,56 +145,75 @@ describe('Integration: ', () => {
       })));
 
     it('should update a transaction', () => {
-      const transactionInserted = {
+      const transactionToInsert = {
         type: 'expense',
         amount: -1567,
         description: 'expense test - update',
       };
 
-      return getCollection(collectionName).insertOne(transactionInserted)
-        .then(result => expect(result.insertedCount).to.equal(1))
-        .then(() => {
-          const transactionId = transactionInserted._id;
-          const transactionPayload = {
+      return getCollection(collectionName)
+        .insertOne(transactionToInsert)
+        .then((insertedTransaction) => {
+          expect(insertedTransaction.insertedCount).to.equal(1);
+          const transactionId = String(insertedTransaction.ops[0]._id);
+
+          const validTransactionPayload = {
             type: 'income',
             amount: 1377,
             description: 'expense test - updated',
           };
 
-          return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(200)
-            .then(res => expect(res.body).to.deep
-              .equal(Object.assign({}, transactionPayload, { _id: String(transactionId) })))
-            .then(() => getCollection(collectionName).findOne(transactionPayload))
-            .then(expected => expect(expected)
-              .to.deep.equal(Object.assign({}, transactionPayload, { _id: transactionId })));
+          return request
+            .put(`/transactions/${transactionId}`)
+            .send(validTransactionPayload)
+            .expect(200)
+            .then((res) => {
+              expect(res.body)
+                .to.deep.equal(Object.assign({}, validTransactionPayload, { _id: transactionId }));
+
+              return getCollection(collectionName)
+                .findOne(validTransactionPayload, { fields: { _id: 0 } })
+                .then(updatedTransaction => expect(updatedTransaction)
+                  .to.deep.equal(validTransactionPayload));
+            });
         });
     });
 
-    it('should update a non-existent transaction', () => {
+    it('should insert on update a non-existent transaction', () => {
       const transactionId = '58b2169e8d51e83a48b0b8d7';
-      const transactionPayload = {
+      const validTransactionPayload = {
         type: 'income',
         amount: 1179,
         description: 'income test - updated',
       };
-      const expected = Object.assign({}, transactionPayload, { _id: transactionId });
+      const expected = Object.assign({}, validTransactionPayload, { _id: transactionId });
 
-      return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(200)
-        .then(res => expect(res.body).to.deep.equal(expected))
-        .then(() => getCollection(collectionName).findOne(transactionPayload))
-        .then(actual => expect(Object.assign({}, actual, { _id: String(actual._id) }))
-          .to.deep.equal(expected));
+      return request
+        .put(`/transactions/${String(transactionId)}`)
+        .send(validTransactionPayload)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal(expected);
+
+          return getCollection(collectionName)
+            .findOne(validTransactionPayload)
+            .then(actual => expect(Object.assign({}, actual, { _id: String(actual._id) }))
+              .to.deep.equal(expected));
+        });
     });
 
-    it('should receive BadRequest status when trying to update with an invalid transactionId', () => {
-      const transactionId = '58b2169e8d51e83a48b0b8dk';
-      const transactionPayload = {
+    it('should receive BadRequest status when trying to update a transaction with invalid id', () => {
+      const invalidTarnsactionId = 'invalidTransactionId';
+      const validTransactionPayload = {
         type: 'income',
         amount: 1179,
         description: 'income test - updated',
       };
 
-      return request.put(`/transactions/${String(transactionId)}`).send(transactionPayload).expect(400)
+      return request
+        .put(`/transactions/${String(invalidTarnsactionId)}`)
+        .send(validTransactionPayload)
+        .expect(400)
         .then(res => expect(res.body).to.deep.equal({
           message: 'transaction id must be a string of 24 hex characters',
         }));

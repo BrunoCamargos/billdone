@@ -11,7 +11,7 @@ describe('Unit: app.js ', () => {
       console.error.restore();
     });
 
-    it('should be unable to start the server', () => {
+    it('should be unable to start the server when unable to connect to database', () => {
       const processExitSpy = sinon.stub(process, 'exit');
       config.db.url = 'invalidUrl:27017/test';
 
