@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import joi from 'joi';
 
-dotenv.load();
+(!process.env.NODE_ENV) && dotenv.load();
 
 const load = () => {
   const envVarsSchema = joi.object({
