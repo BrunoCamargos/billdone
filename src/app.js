@@ -6,14 +6,21 @@ import handleRoutes from './handle-routes';
 import config from './commons/config';
 import * as db from './commons/db';
 
+const skipMongan = () => process.env.NODE_ENV === 'test';
+
 const morganRequest = (app) => {
   morgan.token('req-body', req => JSON.stringify(req.body));
-  app.use(morgan('[:date[clf]] Request  -> :method :url HTTP/:http-version :req-body', { immediate: true })); // Request
+  app.use(morgan('[:date[clf]] Request  -> :method :url HTTP/:http-version :req-body', {
+    immediate: true,
+    skip: skipMongan,
+  })); // Request
   return app;
 };
 
 const morganResponse = (app) => {
-  app.use(morgan('[:date[clf]] Response -> :method :url :status :response-time[2]ms')); // Response
+  app.use(morgan('[:date[clf]] Response -> :method :url :status :response-time[2]ms', {
+    skip: skipMongan,
+  })); // Response
   return app;
 };
 
@@ -21,7 +28,7 @@ const setupMorgan = app => morganResponse(morganRequest(app));
 
 const expressFactory = () => {
   const app = express();
-  app.use(bodyParser.json()); // parsing application/json
+  app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
   setupMorgan(app);
 
   handleRoutes(app);

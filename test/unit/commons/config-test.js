@@ -4,8 +4,7 @@ describe('Unit: config-loader.js ', () => {
   describe('.load()', () => {
     it('should provide required environment variables', () => {
       const expected = 'Config validation error: child "NODE_ENV" fails because ["NODE_ENV" ' +
-        'is required]. child "DB_URL" fails because ["DB_URL" is required]. child "APP_HOST" ' +
-        'fails because ["APP_HOST" is required]';
+        'is required]. child "DB_URL" fails because ["DB_URL" is required]';
       const env = process.env;
       process.env = {};
       expect(loadConfig).to.throw(expected);

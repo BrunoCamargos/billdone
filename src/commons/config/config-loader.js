@@ -7,10 +7,10 @@ const load = () => {
   const envVarsSchema = joi.object({
     NODE_ENV: joi.string().valid('test', 'development', 'production').required(),
     DB_URL: joi.string().required(),
-    APP_PORT: joi.string().default('3775').optional(),
-    APP_HOST: joi.string().required(),
+    APP_PORT: joi.string().default('3775'),
+    APP_HOST: joi.string().default('localhost'),
+    APP_DEFAULT_PAGE_LIMIT: joi.number().integer().positive().default(50),
   }).unknown().required();
-
 
   const { error, value: envVars } = joi.validate(process.env, envVarsSchema, { abortEarly: false });
   if (error) {
@@ -25,6 +25,7 @@ const load = () => {
     app: {
       host: envVars.APP_HOST,
       port: envVars.APP_PORT,
+      defaultPageLimit: envVars.APP_DEFAULT_PAGE_LIMIT,
     },
   };
 };
