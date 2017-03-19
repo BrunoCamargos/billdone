@@ -1,12 +1,14 @@
 import express from 'express';
 import { ObjectId } from 'mongodb';
 import { getCollection } from '../commons/db';
+import logger from '../commons/logger';
 import validateTransaction from './transactions-schema';
 import paginate from '../commons/pagination';
 
 const router = express.Router();
 const collectionName = 'transactions';
 const transactionNotFoundMessage = 'transaction not found';
+
 const sendResponse = (statusCode, res, transactions) => {
   res.format({
     json: () => res.status(statusCode).json(transactions),
@@ -22,6 +24,8 @@ const createObjectId = hexStringId => new Promise((resolve, reject) => {
   try {
     resolve(ObjectId.createFromHexString(hexStringId));
   } catch (e) {
+    const msg = 'transaction id must be a string of 24 hex characters';
+    logger.warn(`IdValidationError - ${msg}`);
     reject(new Error('transaction id must be a string of 24 hex characters'));
   }
 });
@@ -31,8 +35,11 @@ const errorResponseFactory = errorMessage => ({ message: errorMessage });
 const validatePayload = (payload, res) => new Promise((resolve) => {
   validateTransaction(payload)
     .then(resolve)
-    .catch(validationError => res.status(400)
-      .json(errorResponseFactory(validationError.message)));
+    .catch((validationError) => {
+      logger.warn(`PayloadValidationError - ${validationError.message}`);
+      res.status(400)
+        .json(errorResponseFactory(validationError.message));
+    });
 });
 
 router.get('/', (req, res, next) => {
@@ -56,6 +63,7 @@ router.get('/:id', (req, res, next) => {
           if (transaction) {
             sendResponse(200, res, transaction);
           } else {
+            logger.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
             res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
           }
         })
@@ -70,6 +78,8 @@ router.post('/', (req, res, next) => {
     .then(transaction => getCollection(collectionName).insertOne(transaction))
     .then((insertResult) => {
       const transaction = insertResult.ops[0];
+
+      logger.info(`transaction created - id: ${transaction._id}`);
       res.location(`/transactions/${transaction._id}`);
       res.status(201).json(transaction);
     })
@@ -84,8 +94,10 @@ router.delete('/:id', (req, res, next) => {
       getCollection(collectionName).deleteOne(queryById)
         .then((result) => {
           if (!result.deletedCount) {
+            logger.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
             res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
           } else {
+            logger.info(`transaction deleted - id: ${req.params.id}`);
             res.status(204).json();
           }
         })
@@ -105,7 +117,10 @@ router.put('/:id', (req, res, next) => {
           returnOriginal: false,
           upsert: true,
         })
-        .then(updatedResult => res.status(200).json(updatedResult.value))
+        .then((updatedResult) => {
+          logger.info(`transaction updated - id: ${updatedResult.value._id}`);
+          res.status(200).json(updatedResult.value);
+        })
         .catch(next);
     })
     .catch(validationError => res.status(400)

@@ -10,6 +10,8 @@ const load = () => {
     APP_PORT: joi.string().default('3775'),
     APP_HOST: joi.string().default('localhost'),
     APP_DEFAULT_PAGE_LIMIT: joi.number().integer().positive().default(50),
+    LOGGER_LEVEL: joi.string()
+      .allow(['fatal', 'error', 'warn', 'info', 'debug', 'trace']),
   }).unknown().required();
 
   const { error, value: envVars } = joi.validate(process.env, envVarsSchema, { abortEarly: false });
@@ -26,6 +28,9 @@ const load = () => {
       host: envVars.APP_HOST,
       port: envVars.APP_PORT,
       defaultPageLimit: envVars.APP_DEFAULT_PAGE_LIMIT,
+    },
+    logger: {
+      level: envVars.LOGGER_LEVEL,
     },
   };
 };

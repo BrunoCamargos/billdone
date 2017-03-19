@@ -6,6 +6,7 @@ import sinon from 'sinon';
 const setEnvironmentVariables = () => {
   process.env.APP_HOST = 'localhost';
   process.env.DB_URL = 'mongodb://localhost:27017/billdone_test';
+  process.env.LOGGER_LEVEL = 'fatal';
 };
 
 chai.use(sinonChai);

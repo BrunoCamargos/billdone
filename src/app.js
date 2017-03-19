@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import Promise from 'bluebird';
 import handleRoutes from './handle-routes';
 import config from './commons/config';
+import logger from './commons/logger';
 import * as db from './commons/db';
 
 const skipMongan = () => process.env.NODE_ENV === 'test';
@@ -35,11 +36,14 @@ const expressFactory = () => {
 
   app.use((err, req, res, next) => {
     if (err.statusCode && err.statusCode === 406) {
-      res.status(err.statusCode).json({
+      const error = {
         message: `type ${req.headers.accept} is not acceptable, try changing to ${err.types.join(' or ')}`,
-      });
+      };
+
+      logger.warn(err, error.message);
+      res.status(err.statusCode).json(error);
     } else {
-      console.error('Express unhandled exception: ', err);
+      logger.error(err, 'Express unhandled exception');
       res.status(500).json({
         message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
       });
@@ -57,17 +61,17 @@ const start = () => new Promise((resolve, reject) => {
       const app = expressFactory();
 
       const server = app.listen(config.app.port, config.app.host, () => {
-        console.log(`Server listening on http://${config.app.host}:${config.app.port}!`);
+        logger.info(`Server listening on http://${config.app.host}:${config.app.port}!`);
         resolve(server);
       });
 
       server.on('close', () => {
         db.disconnect();
-        console.log('Server closed!');
+        logger.info('Server closed!');
       });
     })
     .catch((err) => {
-      console.error('Unable to start the server: ', err);
+      logger.error(err, 'Unable to start the server: ');
       reject(err);
       process.exit(1);
     });

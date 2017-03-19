@@ -1,17 +1,18 @@
 import { MongoClient } from 'mongodb';
 import Bluebird from 'bluebird';
 import config from './config';
+import logger from './logger';
 
 let db = {};
 
 const connect = () => MongoClient.connect(config.db.url, { promiseLibrary: Bluebird })
   .then((database) => {
-    console.log('Connected to database!');
+    logger.info('Connected to database!');
     db = database;
-    db.on('close', () => console.log('Disconnected from database!'));
+    db.on('close', () => logger.info('Disconnected from database!'));
   })
   .catch((err) => {
-    console.error('Unable to connect to database:', err);
+    logger.error(err, 'Unable to connect to database:');
     throw err;
   });
 
