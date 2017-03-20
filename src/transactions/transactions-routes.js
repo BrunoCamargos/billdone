@@ -1,7 +1,6 @@
 import express from 'express';
 import { ObjectId } from 'mongodb';
 import { getCollection } from '../commons/db';
-import logger from '../commons/logger';
 import validateTransaction from './transactions-schema';
 import paginate from '../commons/pagination';
 
@@ -20,7 +19,7 @@ const sendResponse = (statusCode, res, transactions) => {
   });
 };
 
-const createObjectId = hexStringId => new Promise((resolve, reject) => {
+const createObjectId = (hexStringId, logger) => new Promise((resolve, reject) => {
   try {
     resolve(ObjectId.createFromHexString(hexStringId));
   } catch (e) {
@@ -36,7 +35,7 @@ const validatePayload = (payload, res) => new Promise((resolve) => {
   validateTransaction(payload)
     .then(resolve)
     .catch((validationError) => {
-      logger.warn(`PayloadValidationError - ${validationError.message}`);
+      res.log.warn(`PayloadValidationError - ${validationError.message}`);
       res.status(400)
         .json(errorResponseFactory(validationError.message));
     });
@@ -54,7 +53,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  createObjectId(req.params.id)
+  createObjectId(req.params.id, req.log)
     .then((transactionId) => {
       const queryById = { _id: transactionId };
 
@@ -63,7 +62,7 @@ router.get('/:id', (req, res, next) => {
           if (transaction) {
             sendResponse(200, res, transaction);
           } else {
-            logger.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
+            req.log.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
             res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
           }
         })
@@ -79,7 +78,7 @@ router.post('/', (req, res, next) => {
     .then((insertResult) => {
       const transaction = insertResult.ops[0];
 
-      logger.info(`transaction created - id: ${transaction._id}`);
+      req.log.info(`transaction created - id: ${transaction._id}`);
       res.location(`/transactions/${transaction._id}`);
       res.status(201).json(transaction);
     })
@@ -87,17 +86,17 @@ router.post('/', (req, res, next) => {
 });
 
 router.delete('/:id', (req, res, next) => {
-  createObjectId(req.params.id)
+  createObjectId(req.params.id, req.log)
     .then((transactionId) => {
       const queryById = { _id: transactionId };
 
       getCollection(collectionName).deleteOne(queryById)
         .then((result) => {
           if (!result.deletedCount) {
-            logger.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
+            req.log.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
             res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
           } else {
-            logger.info(`transaction deleted - id: ${req.params.id}`);
+            req.log.info(`transaction deleted - id: ${req.params.id}`);
             res.status(204).json();
           }
         })
@@ -108,7 +107,7 @@ router.delete('/:id', (req, res, next) => {
 });
 
 router.put('/:id', (req, res, next) => {
-  Promise.all([createObjectId(req.params.id), validateTransaction(req.body)])
+  Promise.all([createObjectId(req.params.id, req.log), validateTransaction(req.body)])
     .then(([transactionId, transaction]) => {
       const queryById = { _id: transactionId };
 
@@ -118,7 +117,7 @@ router.put('/:id', (req, res, next) => {
           upsert: true,
         })
         .then((updatedResult) => {
-          logger.info(`transaction updated - id: ${updatedResult.value._id}`);
+          req.log.info(`transaction updated - id: ${updatedResult.value._id}`);
           res.status(200).json(updatedResult.value);
         })
         .catch(next);

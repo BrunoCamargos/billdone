@@ -1,11 +1,15 @@
+/* eslint no-param-reassign: 'off' */
+
 import express from 'express';
 import bodyParser from 'body-parser';
+import requestId from 'express-request-id';
 import morgan from 'morgan';
 import Promise from 'bluebird';
 import handleRoutes from './handle-routes';
 import config from './commons/config';
 import logger from './commons/logger';
 import * as db from './commons/db';
+
 
 const skipMongan = () => process.env.NODE_ENV === 'test';
 
@@ -29,6 +33,15 @@ const setupMorgan = app => morganResponse(morganRequest(app));
 
 const expressFactory = () => {
   const app = express();
+
+  app.use(requestId());
+  app.use((req, res, next) => {
+    const log = logger.child({ reqid: req.id });
+    req.log = log; //
+    res.log = log;
+    next();
+  });
+
   app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
   setupMorgan(app);
 
@@ -40,10 +53,10 @@ const expressFactory = () => {
         message: `type ${req.headers.accept} is not acceptable, try changing to ${err.types.join(' or ')}`,
       };
 
-      logger.warn(err, error.message);
+      req.log.warn(err, error.message);
       res.status(err.statusCode).json(error);
     } else {
-      logger.error(err, 'Express unhandled exception');
+      req.log.error(err, 'Express unhandled exception');
       res.status(500).json({
         message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
       });
