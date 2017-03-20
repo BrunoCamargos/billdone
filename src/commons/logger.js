@@ -1,19 +1,22 @@
 import bunyan from 'bunyan';
 import config from './config';
 
+const streams = [{
+  stream: process.stdout,
+}, {
+  type: 'rotating-file',
+  path: './logs/billdone-errors.log',
+  level: 'error',
+}, {
+  type: 'rotating-file',
+  path: './logs/billdone.log',
+}];
+
 const configOptions = {
   name: 'billdone',
   level: config.logger.level,
+  streams: config.logger.enabled ? streams : [],
 };
-
-// streams: [{
-//     stream: process.stdout
-//   }, {
-//     type: 'rotating-file',
-//     path: `${config.logger.filePath}`,
-//     period: '1d',
-//     count: config.logger.backCopies
-//   }]
 
 const logger = bunyan.createLogger(configOptions);
 

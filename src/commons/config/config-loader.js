@@ -5,13 +5,27 @@ import joi from 'joi';
 
 const load = () => {
   const envVarsSchema = joi.object({
-    NODE_ENV: joi.string().valid('test', 'development', 'production').required(),
-    DB_URL: joi.string().required(),
-    APP_PORT: joi.string().default('3775'),
-    APP_HOST: joi.string().default('localhost'),
-    APP_DEFAULT_PAGE_LIMIT: joi.number().integer().positive().default(50),
+    NODE_ENV: joi.string()
+      .valid('test', 'development', 'production')
+      .required(),
+    DB_URL: joi.string()
+      .required(),
+    APP_PORT: joi.string()
+      .default('3775'),
+    APP_HOST: joi.string()
+      .default('localhost'),
+    APP_DEFAULT_PAGE_LIMIT: joi.number()
+      .integer()
+      .positive()
+      .default(50),
     LOGGER_LEVEL: joi.string()
       .allow(['fatal', 'error', 'warn', 'info', 'debug', 'trace']),
+    LOGGER_ENABLED: joi.boolean()
+      .truthy('TRUE')
+      .truthy('true')
+      .falsy('FALSE')
+      .falsy('false')
+      .default(true),
   }).unknown().required();
 
   const { error, value: envVars } = joi.validate(process.env, envVarsSchema, { abortEarly: false });
@@ -31,6 +45,7 @@ const load = () => {
     },
     logger: {
       level: envVars.LOGGER_LEVEL,
+      enabled: envVars.LOGGER_ENABLED,
     },
   };
 };

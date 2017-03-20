@@ -12,6 +12,7 @@
     "test:unit": "NODE_ENV=test mocha test/unit",
     "test:integration": "NODE_ENV=test mocha test/integration",
     "start": "babel-node index.js",
+    "dev": "babel-node index.js | bunyan",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "metric": "nodejs-dashboard -- babel-node index.js"
