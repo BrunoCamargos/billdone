@@ -15,7 +15,7 @@ const skipMongan = () => process.env.NODE_ENV === 'test';
 
 const morganRequest = (app) => {
   morgan.token('req-body', req => JSON.stringify(req.body));
-  app.use(morgan('[:date[clf]] Request  -> :method :url HTTP/:http-version :req-body', {
+  app.use(morgan('[:date[clf]] Request (:req-id) -> :method :url HTTP/:http-version :req-body', {
     immediate: true,
     skip: skipMongan,
   })); // Request
@@ -23,7 +23,7 @@ const morganRequest = (app) => {
 };
 
 const morganResponse = (app) => {
-  app.use(morgan('[:date[clf]] Response -> :method :url :status :response-time[2]ms', {
+  app.use(morgan('[:date[clf]] Response (:req-id) -> :method :url :status :response-time[2]ms', {
     skip: skipMongan,
   })); // Response
   return app;
@@ -43,6 +43,8 @@ const expressFactory = () => {
   });
 
   app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
+
+  morgan.token('req-id', req => req.id);
   setupMorgan(app);
 
   handleRoutes(app);
