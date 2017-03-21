@@ -9,13 +9,13 @@ import handleRoutes from './handle-routes';
 import config from './commons/config';
 import logger from './commons/logger';
 import * as db from './commons/db';
-
+import bunyanMorgan from './commons/bunyan-morgan';
 
 const skipMongan = () => process.env.NODE_ENV === 'test';
 
 const morganRequest = (app) => {
   morgan.token('req-body', req => JSON.stringify(req.body));
-  app.use(morgan('[:date[clf]] Request (:req-id) -> :method :url HTTP/:http-version :req-body', {
+  app.use(morgan('[:date[iso]] Request (:req-id) -> :method :url HTTP/:http-version :req-body', {
     immediate: true,
     skip: skipMongan,
   })); // Request
@@ -23,7 +23,7 @@ const morganRequest = (app) => {
 };
 
 const morganResponse = (app) => {
-  app.use(morgan('[:date[clf]] Response (:req-id) -> :method :url :status :response-time[2]ms', {
+  app.use(morgan('[:date[iso]] Response (:req-id) -> :method :url :status :response-time[2]ms', {
     skip: skipMongan,
   })); // Response
   return app;
@@ -35,6 +35,7 @@ const expressFactory = () => {
   const app = express();
 
   app.use(requestId());
+  app.use(bunyanMorgan(logger));
   app.use((req, res, next) => {
     const log = logger.child({ reqid: req.id });
     req.log = log; //
