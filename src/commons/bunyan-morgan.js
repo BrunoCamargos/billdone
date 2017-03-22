@@ -15,36 +15,28 @@ const bunyanMorgan = (logger) => {
 
   function recordStartTime() {
     this._startAt = process.hrtime();
-    this._startTime = Date.now();
   }
 
   const expressMiddleware = (req, res, next) => {
-    // request data
+    // request and response start time
     req._startAt = undefined;
-    req._startTime = undefined;
-
-    // response data
     res._startAt = undefined;
-    res._startTime = undefined;
 
     recordStartTime.call(req);
 
-    const logRequest = () => {
-      logger.info('req._startAt: ', req._startAt);
-      logger.info('req._startTime: ', req._startTime);
-    };
+    const logRequest = () => logger.info({ req }, 'Request');
 
     const logResponse = () => {
-      logger.info(`${getResponseTime(req, res)}ms`);
+      res.responseTime = getResponseTime(req, res);
+      logger.info({ res }, 'Response');
     };
 
-    // log request
     logRequest();
 
     // record response start
     onHeaders(res, recordStartTime);
 
-    // log when response finished
+    // log response when finished
     onFinished(res, logResponse);
 
     next();

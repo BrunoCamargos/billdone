@@ -35,18 +35,19 @@ const expressFactory = () => {
   const app = express();
 
   app.use(requestId());
-  app.use(bunyanMorgan(logger));
   app.use((req, res, next) => {
     const log = logger.child({ reqid: req.id });
-    req.log = log; //
+    req.log = log;
     res.log = log;
     next();
   });
 
+  app.use(bunyanMorgan(logger));
+  setupMorgan(app);
+
   app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
 
   morgan.token('req-id', req => req.id);
-  setupMorgan(app);
 
   handleRoutes(app);
 
@@ -56,16 +57,16 @@ const expressFactory = () => {
         message: `type ${req.headers.accept} is not acceptable, try changing to ${err.types.join(' or ')}`,
       };
 
-      req.log.warn(err, error.message);
+      req.log.warn({ err }, error.message);
       res.status(err.statusCode).json(error);
     } else {
-      req.log.error(err, 'Express unhandled exception');
+      req.log.error({ err }, 'Express unhandled exception');
       res.status(500).json({
         message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
       });
     }
 
-    next();
+    next(err);
   });
 
   return app;
