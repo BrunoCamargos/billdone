@@ -4,9 +4,10 @@ import { getCollection } from '../commons/db';
 import validateTransaction from './transactions-schema';
 import paginate from '../commons/pagination';
 
+const COLLECTION_NAME = 'transactions';
+const TRANSACTION_NOT_FOUND = 'transaction not found';
+
 const router = express.Router();
-const collectionName = 'transactions';
-const transactionNotFoundMessage = 'transaction not found';
 
 const sendResponse = (statusCode, res, transactions) => {
   res.format({
@@ -35,7 +36,7 @@ const validatePayload = (payload, res) => new Promise((resolve) => {
   validateTransaction(payload)
     .then(resolve)
     .catch((validationError) => {
-      res.log.warn(`PayloadValidationError - ${validationError.message}`);
+      res.logger.warn(`PayloadValidationError - ${validationError.message}`);
       res.status(400)
         .json(errorResponseFactory(validationError.message));
     });
@@ -43,7 +44,7 @@ const validatePayload = (payload, res) => new Promise((resolve) => {
 
 router.get('/', (req, res, next) => {
   const { skip, limit } = paginate(req.query.page, req.query.limit);
-  getCollection(collectionName)
+  getCollection(COLLECTION_NAME)
     .find()
     .skip(skip)
     .limit(limit)
@@ -53,17 +54,17 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  createObjectId(req.params.id, req.log)
+  createObjectId(req.params.id, req.logger)
     .then((transactionId) => {
       const queryById = { _id: transactionId };
 
-      getCollection(collectionName).findOne(queryById)
+      getCollection(COLLECTION_NAME).findOne(queryById)
         .then((transaction) => {
           if (transaction) {
             sendResponse(200, res, transaction);
           } else {
-            req.log.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
-            res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
+            req.logger.warn(`${TRANSACTION_NOT_FOUND} - id: ${req.params.id}`);
+            res.status(404).json(errorResponseFactory(TRANSACTION_NOT_FOUND));
           }
         })
         .catch(next);
@@ -74,11 +75,11 @@ router.get('/:id', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   validatePayload(req.body, res)
-    .then(transaction => getCollection(collectionName).insertOne(transaction))
+    .then(transaction => getCollection(COLLECTION_NAME).insertOne(transaction))
     .then((insertResult) => {
       const transaction = insertResult.ops[0];
 
-      req.log.info(`transaction created - id: ${transaction._id}`);
+      req.logger.info(`transaction created - id: ${transaction._id}`);
       res.location(`/transactions/${transaction._id}`);
       res.status(201).json(transaction);
     })
@@ -86,17 +87,17 @@ router.post('/', (req, res, next) => {
 });
 
 router.delete('/:id', (req, res, next) => {
-  createObjectId(req.params.id, req.log)
+  createObjectId(req.params.id, req.logger)
     .then((transactionId) => {
       const queryById = { _id: transactionId };
 
-      getCollection(collectionName).deleteOne(queryById)
+      getCollection(COLLECTION_NAME).deleteOne(queryById)
         .then((result) => {
           if (!result.deletedCount) {
-            req.log.warn(`${transactionNotFoundMessage} - id: ${req.params.id}`);
-            res.status(404).json(errorResponseFactory(transactionNotFoundMessage));
+            req.logger.warn(`${TRANSACTION_NOT_FOUND} - id: ${req.params.id}`);
+            res.status(404).json(errorResponseFactory(TRANSACTION_NOT_FOUND));
           } else {
-            req.log.info(`transaction deleted - id: ${req.params.id}`);
+            req.logger.info(`transaction deleted - id: ${req.params.id}`);
             res.status(204).json();
           }
         })
@@ -107,17 +108,17 @@ router.delete('/:id', (req, res, next) => {
 });
 
 router.put('/:id', (req, res, next) => {
-  Promise.all([createObjectId(req.params.id, req.log), validateTransaction(req.body)])
+  Promise.all([createObjectId(req.params.id, req.logger), validateTransaction(req.body)])
     .then(([transactionId, transaction]) => {
       const queryById = { _id: transactionId };
 
-      getCollection(collectionName)
+      getCollection(COLLECTION_NAME)
         .findOneAndUpdate(queryById, { $set: transaction }, {
           returnOriginal: false,
           upsert: true,
         })
         .then((updatedResult) => {
-          req.log.info(`transaction updated - id: ${updatedResult.value._id}`);
+          req.logger.info(`transaction updated - id: ${updatedResult.value._id}`);
           res.status(200).json(updatedResult.value);
         })
         .catch(next);

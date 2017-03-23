@@ -7,7 +7,7 @@ const setEnvironmentVariables = () => {
   process.env.APP_HOST = 'localhost';
   process.env.DB_URL = 'mongodb://localhost:27017/billdone_test';
   process.env.LOGGER_LEVEL = 'info';
-  process.env.LOGGER_ENABLED = true;
+  process.env.LOGGER_ENABLED = false;
 };
 
 chai.use(sinonChai);

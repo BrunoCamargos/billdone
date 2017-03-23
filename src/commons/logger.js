@@ -8,14 +8,6 @@ const reqSerializer = (req) => {
   }
 
   const reqSerialized = bunyan.stdSerializers.req(req);
-  /* Came from bunyan serializer
-  {
-    method: req.method,
-    url: req.url,
-    headers: req.headers,
-    remoteAddress: req.connection.remoteAddress,
-    remotePort: req.connection.remotePort
-  }; */
 
   const complementKeys = {
     body: req.body || {},
@@ -32,19 +24,9 @@ const resSerializer = (res) => {
   }
 
   const resSerialized = bunyan.stdSerializers.res(res);
-  /* Came from bunyan serializer
-  {
-    statusCode: res.statusCode,
-    header: res._header
-  }; */
-
-  // const headersSent = (res) => {
-  //   return typeof res.headersSent !== 'boolean' ? Boolean(res._header) : res.headersSent
-  // };
-  // statusCode: headersSent(res) ? res.statusCode : undefined,
 
   const complementKeys = {
-    responseTime: `${res.responseTime}ms`,
+    responseTime: res.responseTime && `${res.responseTime}ms`,
   };
 
   return Object.assign({}, complementKeys, resSerialized);

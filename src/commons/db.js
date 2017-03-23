@@ -12,7 +12,7 @@ const connect = () => MongoClient.connect(config.db.url, { promiseLibrary: Blueb
     db.on('close', () => logger.info('Disconnected from database!'));
   })
   .catch((err) => {
-    logger.error(err, 'Unable to connect to database:');
+    logger.error({ err }, 'Unable to connect to database:');
     throw err;
   });
 

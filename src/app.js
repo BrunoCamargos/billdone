@@ -3,7 +3,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import requestId from 'express-request-id';
-import morgan from 'morgan';
 import Promise from 'bluebird';
 import handleRoutes from './handle-routes';
 import config from './commons/config';
@@ -11,43 +10,20 @@ import logger from './commons/logger';
 import * as db from './commons/db';
 import bunyanMorgan from './commons/bunyan-morgan';
 
-const skipMongan = () => process.env.NODE_ENV === 'test';
-
-const morganRequest = (app) => {
-  morgan.token('req-body', req => JSON.stringify(req.body));
-  app.use(morgan('[:date[iso]] Request (:req-id) -> :method :url HTTP/:http-version :req-body', {
-    immediate: true,
-    skip: skipMongan,
-  })); // Request
-  return app;
-};
-
-const morganResponse = (app) => {
-  app.use(morgan('[:date[iso]] Response (:req-id) -> :method :url :status :response-time[2]ms', {
-    skip: skipMongan,
-  })); // Response
-  return app;
-};
-
-const setupMorgan = app => morganResponse(morganRequest(app));
-
 const expressFactory = () => {
   const app = express();
 
   app.use(requestId());
   app.use((req, res, next) => {
-    const log = logger.child({ reqid: req.id });
-    req.log = log;
-    res.log = log;
+    const childLogger = logger.child({ reqId: req.id });
+    req.logger = childLogger;
+    res.logger = childLogger;
     next();
   });
 
-  app.use(bunyanMorgan(logger));
-  setupMorgan(app);
+  app.use(bunyanMorgan());
 
   app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
-
-  morgan.token('req-id', req => req.id);
 
   handleRoutes(app);
 
@@ -57,10 +33,10 @@ const expressFactory = () => {
         message: `type ${req.headers.accept} is not acceptable, try changing to ${err.types.join(' or ')}`,
       };
 
-      req.log.warn({ err }, error.message);
+      req.logger.warn({ err }, error.message);
       res.status(err.statusCode).json(error);
     } else {
-      req.log.error({ err }, 'Express unhandled exception');
+      req.logger.error({ err }, 'Express unhandled exception');
       res.status(500).json({
         message: 'Oh no. Really!? Sorry for this my friend, something went very wrong :/',
       });
@@ -88,7 +64,7 @@ const start = () => new Promise((resolve, reject) => {
       });
     })
     .catch((err) => {
-      logger.error(err, 'Unable to start the server: ');
+      logger.error({ err }, 'Unable to start the server: ');
       reject(err);
       process.exit(1);
     });

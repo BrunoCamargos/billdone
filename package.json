@@ -28,7 +28,6 @@
     "express-request-id": "^1.4.0",
     "joi": "^10.2.1",
     "mongodb": "^2.2.22",
-    "morgan": "^1.8.1",
     "on-finished": "^2.3.0",
     "on-headers": "^1.0.1"
   },

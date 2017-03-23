@@ -18,6 +18,13 @@ const bunyanMorgan = (logger) => {
   }
 
   const expressMiddleware = (req, res, next) => {
+    if (!logger) {
+      logger = req.logger;
+
+      if (!logger) {
+        throw Error('parameter logger not provided');
+      }
+    }
     // request and response start time
     req._startAt = undefined;
     res._startAt = undefined;
