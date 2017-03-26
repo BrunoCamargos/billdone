@@ -57,3 +57,5 @@ const configOptions = {
 const logger = bunyan.createLogger(configOptions);
 
 export default logger;
+
+export { reqSerializer, resSerializer };
