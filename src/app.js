@@ -1,5 +1,7 @@
 /* eslint no-param-reassign: 'off' */
 
+import fs from 'fs';
+import https from 'https';
 import express from 'express';
 import bodyParser from 'body-parser';
 import requestId from 'express-request-id';
@@ -53,8 +55,16 @@ const start = () => new Promise((resolve, reject) => {
     .then(() => {
       const app = expressFactory();
 
+      const certificate = {
+        cert: fs.readFileSync('./server.crt'),
+        key: fs.readFileSync('./server.key'),
+      };
+
+      https.createServer(certificate, app)
+        .listen(8445, () => logger.info(`App securely running on https://${config.app.host}:8445`));
+
       const server = app.listen(config.app.port, config.app.host, () => {
-        logger.info(`Server listening on http://${config.app.host}:${config.app.port}!`);
+        logger.info(`Server running on http://${config.app.host}:${config.app.port}`);
         resolve(server);
       });
 
