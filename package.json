@@ -29,7 +29,8 @@
     "joi": "^10.2.1",
     "mongodb": "^2.2.22",
     "on-finished": "^2.3.0",
-    "on-headers": "^1.0.1"
+    "on-headers": "^1.0.1",
+    "spdy": "^3.4.4"
   },
   "repository": "git@github.com:BrunoCamargos/billdone.git",
   "author": "Bruno Camargos <bruno.camargos@gmail.com>",
