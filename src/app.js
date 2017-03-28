@@ -1,6 +1,5 @@
 /* eslint no-param-reassign: 'off' */
 
-import fs from 'fs';
 // import https from 'https';
 import spdy from 'spdy';
 import express from 'express';
@@ -29,7 +28,7 @@ const expressFactory = () => {
   app.use(bodyParser.json({ type: 'application/json' })); // Para futuro uso c HATEOAS - (vn.dfd/json)
 
   handleRoutes(app);
-  
+
   app.use((err, req, res, next) => {
     if (err.statusCode && err.statusCode === 406) {
       const error = {
@@ -56,21 +55,16 @@ const start = () => new Promise((resolve, reject) => {
     .then(() => {
       const app = expressFactory();
 
-      const certificate = {
-        cert: fs.readFileSync('./server.crt'),
-        key: fs.readFileSync('./server.key'),
-      };
+      spdy.createServer(config.app.ssl, app)
+        .listen(config.app.httpsPort, () => logger.info(`Server securely running on https://${config.app.host}:${config.app.httpsPort}`));
+
+      // https.createServer(certificate, app)
+      //   .listen(config.app.httpsPort, () => logger.info(`Server securely running on https://${config.app.host}:${config.app.httpsPort}`));
 
       const server = app.listen(config.app.port, config.app.host, () => {
         logger.info(`Server running on http://${config.app.host}:${config.app.port}`);
         resolve(server);
       });
-
-      spdy.createServer(certificate, app)
-        .listen(8445, () => logger.info(`Server securely running on https://${config.app.host}:8445`));
-
-      // https.createServer(certificate, app)
-      //   .listen(8445, () => logger.info(`Server securely running on https://${config.app.host}:8445`));
 
       server.on('close', () => {
         db.disconnect();
