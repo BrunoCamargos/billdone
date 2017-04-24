@@ -6,12 +6,12 @@ import logger from './logger';
 let db = {};
 
 const connect = () => MongoClient.connect(config.db.url, { promiseLibrary: Bluebird })
-  .then((database) => {
+  .then(database => {
     logger.info('Connected to database!');
     db = database;
     db.on('close', () => logger.info('Disconnected from database!'));
   })
-  .catch((err) => {
+  .catch(err => {
     logger.error({ err }, 'Unable to connect to database:');
     throw err;
   });

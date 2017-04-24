@@ -71,7 +71,7 @@ const start = () => new Promise((resolve, reject) => {
         logger.info('Server closed!');
       });
     })
-    .catch((err) => {
+    .catch(err => {
       logger.error({ err }, 'Unable to start the server: ');
       reject(err);
       process.exit(1);

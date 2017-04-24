@@ -6,6 +6,10 @@ rules:
   no-unused-expressions: 
     - "error" 
     - allowShortCircuit: true
+  arrow-parens: 
+    - "error"
+    - "as-needed"
+    - requireForBlockBody: false
 env:
   node: true
   es6: true

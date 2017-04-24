@@ -8,7 +8,7 @@ describe('Unit: app.js ', () => {
       config.db.url = 'invalidUrl:27017/test';
 
       return startApp()
-        .catch((err) => {
+        .catch(err => {
           expect(processExitSpy).to.have.been.calledWith(1);
           processExitSpy.restore();
           throw err;

@@ -3,7 +3,7 @@
 import onFinished from 'on-finished';
 import onHeaders from 'on-headers';
 
-const bunyanMorgan = (logger) => {
+const bunyanMorgan = logger => {
   const getResponseTime = (req, res, digits = 2) => {
     // calculate diff
     const ms = ((res._startAt[0] - req._startAt[0]) * 1e3) +

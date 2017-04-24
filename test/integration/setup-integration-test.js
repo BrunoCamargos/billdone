@@ -8,7 +8,7 @@ global.getCollection = getCollection;
 
 let server = {};
 before('Starting app...', () => startApp()
-  .then((app) => {
+  .then(app => {
     global.request = supertest(app);
     server = app;
   }));

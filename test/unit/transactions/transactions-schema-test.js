@@ -9,7 +9,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "amount" fails because ["amount" is required]');
           });
@@ -22,7 +22,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "amount" fails because ["amount" must be an integer]');
           });
@@ -35,7 +35,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "amount" fails because ["amount" must be a positive number]');
           });
@@ -48,7 +48,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "amount" fails because ["amount" must be a negative number]');
           });
@@ -62,7 +62,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "type" fails because ["type" is required]');
           });
@@ -75,7 +75,7 @@ describe('Unit: transactions-schema.js ', () => {
         };
 
         return validateTransaction(transaction)
-          .catch((validationError) => {
+          .catch(validationError => {
             expect(validationError).to.be.an('error');
             expect(validationError.message).to.equal('child "type" fails because ["type" must be one of [expense, income]]');
           });

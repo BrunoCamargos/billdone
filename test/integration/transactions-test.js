@@ -9,7 +9,7 @@ const assertInvalidId = res => expect(res.body).to.deep.equal({
 
 describe('Integration: ', () => {
   describe('Resources - Transactions', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       getCollection(collectionName)
         .drop()
         .then(() => done())
@@ -46,13 +46,13 @@ describe('Integration: ', () => {
 
       it('should return the first page with 2 transactions', () => getCollection(collectionName)
           .insertMany(transactionsToInsert)
-          .then((transactionsInserted) => {
+          .then(transactionsInserted => {
             expect(transactionsInserted.insertedCount).to.equal(5);
 
             return request
               .get(`${transactionsResource}/?page=1&limit=2`)
               .expect(200)
-              .then((res) => {
+              .then(res => {
                 const transactions = res.body;
                 const expected = transactionsToInsert.slice(0, 2);
 
@@ -63,13 +63,13 @@ describe('Integration: ', () => {
 
       it('should return the second page with 2 transactions', () => getCollection(collectionName)
           .insertMany(transactionsToInsert)
-          .then((transactionsInserted) => {
+          .then(transactionsInserted => {
             expect(transactionsInserted.insertedCount).to.equal(5);
 
             return request
               .get(`${transactionsResource}/?page=2&limit=2`)
               .expect(200)
-              .then((res) => {
+              .then(res => {
                 const transactions = res.body;
                 const expected = transactionsToInsert.slice(2, 4);
 
@@ -80,14 +80,14 @@ describe('Integration: ', () => {
 
       it('should return 3 transactions - max page size defined', () => getCollection(collectionName)
           .insertMany(transactionsToInsert)
-          .then((transactionsInserted) => {
+          .then(transactionsInserted => {
             expect(transactionsInserted.insertedCount).to.equal(5);
 
             config.app.defaultPageLimit = 3;
             return request
               .get(`${transactionsResource}/?page=1&limit=130`)
               .expect(200)
-              .then((res) => {
+              .then(res => {
                 const transactions = res.body;
                 const expected = transactionsToInsert.slice(0, 3);
 
@@ -123,7 +123,7 @@ describe('Integration: ', () => {
           .post(transactionsResource)
           .send(validTransactionPayload)
           .expect(201)
-          .then((res) => {
+          .then(res => {
             expect(res.headers).to.include.keys('location');
             expect(res.body)
               .to.deep.equal(Object.assign({}, validTransactionPayload, { _id: res.body._id }));
@@ -160,13 +160,13 @@ describe('Integration: ', () => {
 
         return getCollection(collectionName)
           .insertOne(expected)
-          .then((insertedTransaction) => {
+          .then(insertedTransaction => {
             expect(insertedTransaction.insertedCount).to.equal(1);
 
             return request
               .get(`${transactionsResource}/${String(expected._id)}`)
               .expect(200)
-              .then((res) => {
+              .then(res => {
                 expect(res.body)
                   .to.deep.equal(Object.assign({}, expected, { _id: String(expected._id) }));
               });
@@ -196,7 +196,7 @@ describe('Integration: ', () => {
 
         return getCollection(collectionName)
           .insertOne(trasactionToDelele)
-          .then((insertedTransaction) => {
+          .then(insertedTransaction => {
             expect(insertedTransaction.insertedCount).to.equal(1);
 
             return request
@@ -228,7 +228,7 @@ describe('Integration: ', () => {
 
         return getCollection(collectionName)
           .insertOne(transactionToInsert)
-          .then((insertedTransaction) => {
+          .then(insertedTransaction => {
             expect(insertedTransaction.insertedCount).to.equal(1);
             const transactionId = String(insertedTransaction.ops[0]._id);
 
@@ -242,7 +242,7 @@ describe('Integration: ', () => {
               .put(`${transactionsResource}/${transactionId}`)
               .send(validTransactionPayload)
               .expect(200)
-              .then((res) => {
+              .then(res => {
                 expect(res.body).to.deep
                   .equal(Object.assign({}, validTransactionPayload, { _id: transactionId }));
 
@@ -267,7 +267,7 @@ describe('Integration: ', () => {
           .put(`${transactionsResource}/${String(transactionId)}`)
           .send(validTransactionPayload)
           .expect(200)
-          .then((res) => {
+          .then(res => {
             expect(res.body).to.deep.equal(expected);
 
             return getCollection(collectionName)

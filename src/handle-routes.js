@@ -1,6 +1,6 @@
 import transactionsRoutes from './transactions';
 
-const handleRoutes = (app) => {
+const handleRoutes = app => {
   app.use('/transactions', transactionsRoutes);
 };
 
